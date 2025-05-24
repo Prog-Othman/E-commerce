@@ -1,198 +1,248 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
-
+@section('title', 'Tableau de bord')
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 @section('content')
-<div class="flex min-h-screen bg-gray-50">
+<div class="flex min-h-screen bg-white">
     <!-- Sidebar -->
-    <div class="w-64 h-screen">
+    <div class="w-64 h-screen border-r border-gray-100">
         @include('partials.sidebar')
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col p-4 sm:p-6">
+    <div class="flex-1 flex flex-col">
         <!-- Header -->
-        <header class="w-full">
+        <header class="w-full border-b border-gray-100 bg-white">
             @include('partials.header')
         </header>
 
         <!-- Dashboard Content -->
-        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <!-- Top Row: Summary Cards -->
-            <div class="col-span-1 md:col-span-2 xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow flex flex-col border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 text-gray-500 font-medium">
-                        <span class="material-icons text-orange-400">attach_money</span>
-                        Total Sales
-                    </div>
-                    <div class="text-3xl font-extrabold text-gray-900 mt-2 flex items-center gap-2">
-                        <span>${{ number_format($totalRevenue, 0) }}</span>
-                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded">+3.1% this week</span>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow flex flex-col border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 text-gray-500 font-medium">
-                        <span class="material-icons text-orange-400">shopping_cart</span>
-                        Total Orders
-                    </div>
-                    <div class="text-3xl font-extrabold text-gray-900 mt-2 flex items-center gap-2">
-                        <span>{{ $totalOrders }}</span>
-                        <span class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded">-2.9% this week</span>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow flex flex-col border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 text-gray-500 font-medium">
-                        <span class="material-icons text-orange-400">groups</span>
-                        Total Visitors
-                    </div>
-                    <div class="text-3xl font-extrabold text-gray-900 mt-2 flex items-center gap-2">
-                        <span>{{ $totalVisitors ?? '237,782' }}</span>
-                        <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded">+4.0% this week</span>
-                    </div>
-                </div>
+        <div class="flex-1 p-8 bg-gray-50">
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-light text-gray-900">Tableau de bord</h1>
+                <p class="text-gray-500 mt-1">Bienvenue, voici ce qui se passe avec votre magasin.</p>
             </div>
-            <!-- Top Categories -->
-            <div class="bg-white p-6 rounded-2xl shadow flex flex-col border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="flex items-center gap-2 font-semibold text-gray-900">
-                        <span class="material-icons text-orange-400">pie_chart</span>
-                        Top Categories
-                    </div>
-                    <a href="#" class="text-xs text-orange-500 font-bold">See All</a>
-                </div>
-                <div>{!! $categoriesChart->container() !!}</div>
-                <ul class="mt-4 space-y-2">
-                    @foreach($topCategories as $cat)
-                        <li class="flex justify-between text-sm">
-                            <span class="text-gray-700">{{ $cat['name'] }}</span>
-                            <span class="font-bold text-gray-900">${{ number_format($cat['value'], 0) }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-            <!-- Revenue Analytics & Monthly Target -->
-            <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-2 font-semibold text-gray-900">
-                            <span class="material-icons text-orange-400">show_chart</span>
-                            Revenue Analytics
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total des ventes</p>
+                            <p class="text-2xl font-light text-gray-900 mt-1">{{ number_format($totalRevenue, 0) }} &euro;</p>
                         </div>
-                        <div class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Last 8 Days</div>
+                        <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                            <span class="material-icons text-orange-500 text-xl">attach_money</span>
+                        </div>
                     </div>
-                    <div>{!! $revenueChart->container() !!}</div>
+                    <div class="mt-4 flex items-center">
+                        <span class="text-orange-500 text-sm">+3.1%</span>
+                        <span class="text-gray-400 text-sm ml-2">par rapport &agrave; la semaine derni&egrave;re</span>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow flex flex-col items-center border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 font-semibold text-gray-900 mb-4">
-                        <span class="material-icons text-orange-400">flag</span>
-                        Monthly Target
+
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total des commandes</p>
+                            <p class="text-2xl font-light text-gray-900 mt-1">{{ $totalOrders }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                            <span class="material-icons text-orange-500 text-xl">shopping_cart</span>
+                        </div>
                     </div>
-                    <div>{!! $targetChart->container() !!}</div>
-                    <div class="mt-4">
-                        <div class="text-green-600 font-bold text-lg">{{ $targetChart->datasets[0]['data'][0] ?? '85' }}%</div>
-                        <div class="text-xs text-gray-500">+6.02% from last month</div>
+                    <div class="mt-4 flex items-center">
+                        <span class="text-gray-400 text-sm">-2.9%</span>
+                        <span class="text-gray-400 text-sm ml-2">par rapport &agrave; la semaine derni&egrave;re</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total des visiteurs</p>
+                            <p class="text-2xl font-light text-gray-900 mt-1">{{ $totalVisitors ?? '237,782' }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                            <span class="material-icons text-orange-500 text-xl">groups</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <span class="text-orange-500 text-sm">+4.0%</span>
+                        <span class="text-gray-400 text-sm ml-2">par rapport &agrave; la semaine derni&egrave;re</span>
                     </div>
                 </div>
             </div>
-            <!-- Traffic Sources & Active User -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-1 md:col-span-2 xl:col-span-2">
-                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 font-semibold text-gray-900 mb-4">
-                        <span class="material-icons text-orange-400">traffic</span>
-                        Traffic Sources
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Revenue Analytics -->
+                @if($revenueChart)
+                    <div class="lg:col-span-2 bg-white rounded-lg p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900">Analytiques des ventes</h3>
+                            <span class="text-sm text-gray-500">Les 8 derniers jours</span>
+                        </div>
+                        <div>{!! $revenueChart->container() !!}</div>
                     </div>
-                    <div>{!! $trafficChart->container() !!}</div>
-                    <ul class="mt-4 space-y-2">
+                @else
+                    <div class="lg:col-span-2 bg-white rounded-lg p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900">Analytiques des ventes</h3>
+                            <span class="text-sm text-gray-500">Les 8 derniers jours</span>
+                        </div>
+                        <div class="text-center py-8 text-gray-500">
+                            <p>Les graphiques ne sont pas disponibles pour le moment.</p>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Monthly Target -->
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <h3 class="text-lg font-medium text-gray-900 mb-6">Objectif mensuel</h3>
+                    <div class="flex flex-col items-center">
+                        @if($targetChart)
+                            <div>{!! $targetChart->container() !!}</div>
+                            <div class="mt-4 text-center">
+                                <div class="text-3xl font-light text-gray-900">{{ $targetChart->datasets[0]['data'][0] ?? '85' }}%</div>
+                                <div class="text-sm text-orange-500 mt-1">+6.02% par rapport au mois dernier</div>
+                            </div>
+                        @else
+                            <div class="text-center py-8 text-gray-500">
+                                <p>Le graphique de l'objectif n'est pas disponible.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Top Categories -->
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Cat&eacute;gories les plus populaires</h3>
+                        <button class="text-orange-500 text-sm hover:text-orange-600">Voir tout</button>
+                    </div>
+                    <div class="mb-4">{!! $categoriesChart->container() !!}</div>
+                    <div class="space-y-3">
+                        @foreach($topCategories as $cat)
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">{{ $cat['name'] }}</span>
+                                <span class="font-medium text-gray-900">{{ number_format($cat['value'], 0) }} &euro;</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Traffic Sources -->
+                <div class="bg-white rounded-lg p-6 border border-gray-100">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Sources de trafic</h3>
+                    <div class="mb-4">{!! $trafficChart->container() !!}</div>
+                    <div class="space-y-3">
                         @foreach($trafficSources as $src)
-                            <li class="flex justify-between text-sm">
-                                <span class="text-gray-700">{{ $src['name'] }}</span>
-                                <span class="font-bold text-gray-900">{{ $src['value'] }}%</span>
-                            </li>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">{{ $src['name'] }}</span>
+                                <span class="font-medium text-gray-900">{{ $src['value'] }}%</span>
+                            </div>
                         @endforeach
-                    </ul>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 font-semibold text-gray-900 mb-4">
-                        <span class="material-icons text-orange-400">person</span>
-                        Active User
                     </div>
-                    <div class="text-2xl font-bold text-gray-900">{{ $activeUsers ?? '2,758' }}</div>
-                    <div class="text-green-500 text-sm mb-2">+8.02% from last month</div>
-                    <ul class="text-sm">
-                        <li>United States <span class="float-right">36%</span></li>
-                        <li>United Kingdom <span class="float-right">24%</span></li>
-                        <li>Indonesia <span class="float-right">17.5%</span></li>
-                        <li>Russia <span class="float-right">15%</span></li>
-                    </ul>
                 </div>
             </div>
-            <!-- Recent Orders & Recent Activity -->
-            <div class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow overflow-x-auto border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-2 font-semibold text-gray-900">
-                            <span class="material-icons text-orange-400">receipt_long</span>
-                            Recent Orders
+
+            <!-- Tables Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Orders -->
+                <div class="lg:col-span-2 bg-white rounded-lg border border-gray-100">
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900">Commandes r&eacute;centes</h3>
+                            <div class="flex items-center space-x-3">
+                                <input type="text" placeholder="Rechercher les commandes..." 
+                                       class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                <button class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600">
+                                    Filtrer
+                                </button>
+                            </div>
                         </div>
-                        <input type="text" placeholder="Search product, customer, etc" class="border border-gray-200 rounded-lg px-3 py-1 text-sm bg-gray-50">
-                        <button class="bg-orange-100 text-orange-500 px-3 py-1 rounded text-xs font-bold ml-2">All Categories</button>
                     </div>
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr class="bg-gray-50 text-gray-500">
-                                <th class="py-2 px-3">No</th>
-                                <th class="py-2 px-3">Order #</th>
-                                <th class="py-2 px-3">Customer</th>
-                                <th class="py-2 px-3">Product</th>
-                                <th class="py-2 px-3">Qty</th>
-                                <th class="py-2 px-3">Total</th>
-                                <th class="py-2 px-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentOrders as $i => $order)
-                            <tr class="border-b hover:bg-orange-50 transition-colors duration-200">
-                                <td class="py-2 px-3">{{ $i+1 }}</td>
-                                <td class="py-2 px-3">#{{ $order->order_number ?? '-' }}</td>
-                                <td class="py-2 px-3">{{ $order->user->name ?? '-' }}</td>
-                                <td class="py-2 px-3">{{ $order->items->first()->product->name ?? '-' }}</td>
-                                <td class="py-2 px-3">{{ $order->items->first()->quantity ?? '-' }}</td>
-                                <td class="py-2 px-3">${{ number_format($order->total_amount ?? 0, 2) }}</td>
-                                <td class="py-2 px-3">
-                                    <span class="px-2 py-1 rounded text-xs font-bold
-                                        {{ $order->status == 'Shipped' ? 'bg-green-100 text-green-700' :
-                                           ($order->status == 'Processing' ? 'bg-yellow-100 text-yellow-700' :
-                                           ($order->status == 'Delivered' ? 'bg-blue-100 text-blue-700' :
-                                           'bg-gray-100 text-gray-700')) }}">
-                                        {{ $order->status ?? '-' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Commande</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($recentOrders as $order)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        #{{ $order->order_number ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {{ $order->user->name ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {{ $order->items->first()->product->name ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ number_format($order->total_amount ?? 0, 2) }} &euro;
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                            {{ $order->status == 'Delivered' ? 'bg-green-100 text-green-800' :
+                                               ($order->status == 'Shipped' ? 'bg-orange-100 text-orange-800' :
+                                               ($order->status == 'Processing' ? 'bg-yellow-100 text-yellow-800' :
+                                               'bg-gray-100 text-gray-800')) }}">
+                                            {{ $order->status ?? 'En attente' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-orange-400 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                    <div class="flex items-center gap-2 font-semibold text-gray-900 mb-4">
-                        <span class="material-icons text-orange-400">history</span>
-                        Recent Activity
-                    </div>
-                    <ul class="space-y-4 text-sm">
-                        @foreach($recentActivities as $activity)
-                            <li class="flex items-start">
-                                <span class="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-2"></span>
-                                <div>
-                                    <div>{{ $activity['text'] }}</div>
-                                    <div class="text-xs text-gray-400">{{ $activity['time'] }}</div>
+
+                <!-- Recent Activity & Active Users -->
+                <div class="space-y-6">
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-lg p-6 border border-gray-100">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Activité récente</h3>
+                        <div class="space-y-4">
+                            @foreach($recentActivities as $activity)
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-900">{{ $activity['text'] ?? 'Aucune activité récente' }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $activity['time'] ?? '' }}</p>
+                                    </div>
                                 </div>
-                            </li>
-                        @endforeach
-                    </ul>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Active Users -->
+                    <div class="bg-white rounded-lg p-6 border border-gray-100">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Utilisateurs actifs</h3>
+                        <div class="text-center mb-4">
+                            <div class="text-3xl font-light text-gray-900">{{ $activeUsers ?? '0' }}</div>
+                            <div class="text-sm text-orange-500">+8.02% par rapport au mois dernier</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
         <!-- Footer -->
-        @include('partials.footer')
+        <footer class="border-t border-gray-100 bg-white">
+            @include('partials.footer')
+        </footer>
     </div>
 </div>
 @endsection
@@ -200,9 +250,9 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-// Example: Set chart colors for ApexCharts
+// Set clean chart colors
 if (window.Apex) {
-    Apex.colors = ['#fb923c', '#64748b']; // orange-400, gray-500
+    Apex.colors = ['#f97316', '#6b7280', '#fed7aa', '#d1d5db']; // orange-500, gray-500, orange-200, gray-300
 }
 </script>
 {!! $revenueChart->script() !!}

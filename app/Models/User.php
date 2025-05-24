@@ -13,22 +13,24 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
-
+    
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -36,7 +38,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -45,14 +47,38 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
         ];
     }
+    
+    /**
+     * Update the user's last login time and IP address.
+     *
+     * @param  string  $ipAddress
+     * @return void
+     */
+    public function updateLastLogin($ipAddress)
+    {
+        $this->last_login_at = now();
+        $this->last_login_ip = $ipAddress;
+        $this->save();
+    }
 
+    /**
+     * Get the user's orders.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * Get the user's cart.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function cart()
     {
         return $this->hasOne(Cart::class);
