@@ -17,37 +17,59 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Basic statistics
         $totalOrders = Order::count();
-        $totalRevenue = Order::where('payment_status', 'completed')->sum('total_amount');
+        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
         $totalProducts = Product::count();
         $totalCustomers = User::role('customer')->count();
         $totalVisitors = 237782; // Example static value
         $activeUsers = 2758; // Example static value
 
-        // 1. Revenue Analytics (last 8 days)
-        $dates = collect(range(0, 7))->map(function ($i) {
-            return Carbon::today()->subDays(7 - $i)->format('Y-m-d');
-        });
-        $orders = Order::where('created_at', '>=', Carbon::today()->subDays(7))
-            ->where('payment_status', 'completed')
-            ->get()
-            ->groupBy(function ($order) {
-                return Carbon::parse($order->created_at)->format('Y-m-d');
-            });
-        $revenueData = [];
-        $orderCountData = [];
-        foreach ($dates as $date) {
-            $dayOrders = $orders->get($date, collect());
-            $revenueData[] = $dayOrders->sum('total_amount');
-            $orderCountData[] = $dayOrders->count();
+        // Initialize empty chart data
+        $revenueChart = null;
+        $targetChart = null;
+        
+        // Check if LarapexChart is available
+        if (class_exists('ArielMejiaDev\LarapexCharts\LarapexChart')) {
+            try {
+                // 1. Revenue Analytics (last 8 days)
+                $dates = collect(range(0, 7))->map(function ($i) {
+                    return Carbon::today()->subDays(7 - $i)->format('Y-m-d');
+                });
+                
+                $orders = Order::where('created_at', '>=', Carbon::today()->subDays(7))
+                    ->where('status', 'completed')
+                    ->get()
+                    ->groupBy(function ($order) {
+                        return Carbon::parse($order->created_at)->format('Y-m-d');
+                    });
+                    
+                $revenueData = [];
+                $orderCountData = [];
+                foreach ($dates as $date) {
+                    $dayOrders = $orders->get($date, collect());
+                    $revenueData[] = $dayOrders->sum('total_amount');
+                    $orderCountData[] = $dayOrders->count();
+                }
+                
+                $revenueChart = (new LarapexChart)->lineChart()
+                    ->setTitle('Revenue Analytics')
+                    ->addData('Revenue', $revenueData)
+                    ->addData('Orders', $orderCountData)
+                    ->setXAxis($dates->map(fn($d) => Carbon::parse($d)->format('d M'))->toArray());
+                
+                // 2. Monthly Target (radial)
+                $targetChart = (new LarapexChart)->radialChart()
+                    ->setTitle('Monthly Target')
+                    ->addData([75])
+                    ->setLabels(['Target']);
+                    
+            } catch (\Exception $e) {
+                // Log error but don't break the page
+                \Log::error('Error generating charts: ' . $e->getMessage());
+            }
         }
-        $revenueChart = (new LarapexChart)->lineChart()
-            ->setTitle('Revenue Analytics')
-            ->addData('Revenue', $revenueData)
-            ->addData('Orders', $orderCountData)
-            ->setXAxis($dates->map(fn($d) => Carbon::parse($d)->format('d M'))->toArray());
-
-        // 2. Monthly Target (radial)
+        
         $monthStart = Carbon::now()->startOfMonth();
         $monthEnd = Carbon::now()->endOfMonth();
         $monthlyRevenue = Order::where('payment_status', 'completed')
@@ -108,22 +130,27 @@ class DashboardController extends Controller
             ['text' => 'Demian Upto\'s order status changed from "Pending" to "Processing".', 'time' => '7:02 AM'],
         ];
 
-        return view('admin.dashboard', compact(
-            'totalOrders',
-            'totalRevenue',
-            'totalProducts',
-            'totalCustomers',
-            'totalVisitors',
-            'activeUsers',
-            'revenueChart',
-            'targetChart',
-            'categoriesChart',
-            'trafficChart',
-            'topCategories',
-            'trafficSources',
-            'recentOrders',
-            'recentActivities'
-        ));
+        // Ensure we have all required variables
+        $data = [
+            'totalOrders' => $totalOrders ?? 0,
+            'totalRevenue' => $totalRevenue ?? 0,
+            'totalProducts' => $totalProducts ?? 0,
+            'totalCustomers' => $totalCustomers ?? 0,
+            'totalVisitors' => $totalVisitors ?? 0,
+            'activeUsers' => $activeUsers ?? 0,
+            'revenueChart' => $revenueChart ?? null,
+            'targetChart' => $targetChart ?? null,
+            'categoriesChart' => $categoriesChart ?? null,
+            'trafficChart' => $trafficChart ?? null,
+            'trafficSources' => $trafficSources ?? [],
+            'topCategories' => $topCategories ?? [],
+            'recentOrders' => $recentOrders ?? [],
+            'recentActivities' => $recentActivities ?? [],
+            'topProducts' => [] ?? [],
+            'cartItemsCount' => 0, // Default value for cart items count
+        ];
+        
+        return view('admin.dashboard', $data);
     }
 
     public function dashboard()

@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\Admin::class,
+        ]);
+        
+        // Add global middleware to track user logins
+        $middleware->append(\App\Http\Middleware\TrackLastLogin::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

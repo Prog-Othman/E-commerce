@@ -13,10 +13,10 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'order_status_id',
         'total_amount',
         'discount_amount',
         'coupon_id',
-        'status',
         'payment_status',
         'payment_method',
         'shipping_address',
@@ -46,6 +46,14 @@ class Order extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    /**
+     * Get the status of the order.
+     */
+    public function status()
+    {
+        return $this->belongsTo(OrderStatus::class, 'order_status_id');
     }
 
     protected static function boot()
